@@ -1,8 +1,19 @@
+
+#ifndef RECCHECK
+#include <set>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+// add or remove necessary headers as you please
+
+#endif
+
 #include "schedwork.h"
-#include <algorithm> // std::find is allowed per instructions
 
 using namespace std;
-
 // Recursive setup for shifts vector
 void initShifts(vector<size_t>& shifts, size_t i, size_t size) {
     if (i == size) return;
