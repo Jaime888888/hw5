@@ -14,16 +14,20 @@
 using namespace std;
 
 
-// Recursive backtracking function
 void recurse(
     const string& in,
     string current,
     int freq[26],
-    size_t totalFloating,  // changed from int to size_t
+    size_t totalFloating,
     const set<string>& dict,
     set<string>& results,
     size_t index
 ) {
+  
+    if ((in.size() - index) < totalFloating) {
+        return;
+    }
+
     if (index == in.size()) {
         if (totalFloating == 0 && dict.find(current) != dict.end()) {
             results.insert(current);
@@ -50,6 +54,7 @@ void recurse(
         }
     }
 }
+
 
 set<string> wordle(
     const string& in,
