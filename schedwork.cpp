@@ -1,45 +1,80 @@
-#ifndef RECCHECK
+
 #include <set>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <map>
-#include <algorithm>
+
 // add or remove necessary headers as you please
 
-#endif
 
 #include "schedwork.h"
+#include <algorithm> // for std::find
 
 using namespace std;
 
-// a constant that can be used to indicate an INVALID 
-// worker ID if that is useful to your implementation.
-// Feel free to not use or delete.
-static const Worker_T INVALID_ID = (unsigned int)-1;
+bool backtrack(
+    const AvailabilityMatrix& avail,
+    size_t dailyNeed,
+    size_t maxShifts,
+    DailySchedule& sched,
+    vector<size_t>& shifts,
+    size_t day,
+    size_t slot
+) {
+    if (day == avail.size()) {
+        return true;
+    }
 
+    for (size_t worker = 0; worker < avail[0].size(); ++worker) {
+        if (avail[day][worker] &&
+            shifts[worker] < maxShifts &&
+            find(sched[day].begin(), sched[day].end(), worker) == sched[day].end()) {
+            
+            sched[day].push_back(worker);
+            shifts[worker]++;
 
-// Add prototypes for any helper functions here
+            size_t next_day = day;
+            size_t next_slot = slot + 1;
+            if (next_slot == dailyNeed) {
+                next_day++;
+                next_slot = 0;
+            }
 
+            if (backtrack(avail, dailyNeed, maxShifts, sched, shifts, next_day, next_slot)) {
+                return true;
+            }
 
-// Add your implementation of schedule() and other helper functions here
+            // backtrack
+            sched[day].pop_back();
+            shifts[worker]--;
+        }
+    }
+
+    return false;
+}
 
 bool schedule(
     const AvailabilityMatrix& avail,
     const size_t dailyNeed,
     const size_t maxShifts,
-    DailySchedule& sched
-)
+    DailySchedule& sched)
 {
-    if(avail.size() == 0U){
+    if (avail.empty() || avail[0].empty()) {
         return false;
     }
+
+    size_t num_days = avail.size();
+    size_t num_workers = avail[0].size();
+
     sched.clear();
-    // Add your code below
+    sched.resize(num_days);
+    for (size_t i = 0; i < num_days; ++i) {
+        sched[i].reserve(dailyNeed);
+    }
 
+    vector<size_t> shifts(num_workers, 0);
 
-
-
+    return backtrack(avail, dailyNeed, maxShifts, sched, shifts, 0, 0);
 }
-
