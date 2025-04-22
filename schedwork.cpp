@@ -1,19 +1,23 @@
-
-#include <set>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <map>
-
-// add or remove necessary headers as you please
-
-
 #include "schedwork.h"
-#include <algorithm> // for std::find
+#include <algorithm> // std::find is allowed per instructions
 
 using namespace std;
 
+// Recursive setup for shifts vector
+void initShifts(vector<size_t>& shifts, size_t i, size_t size) {
+    if (i == size) return;
+    shifts.push_back(0);
+    initShifts(shifts, i + 1, size);
+}
+
+// Recursive setup for sched vector
+void initSched(DailySchedule& sched, size_t i, size_t totalDays, size_t dailyNeed) {
+    if (i == totalDays) return;
+    sched.push_back(vector<Worker_T>());
+    initSched(sched, i + 1, totalDays, dailyNeed);
+}
+
+// Recursive backtracking scheduler
 bool backtrack(
     const AvailabilityMatrix& avail,
     size_t dailyNeed,
@@ -46,7 +50,6 @@ bool backtrack(
                 return true;
             }
 
-            // backtrack
             sched[day].pop_back();
             shifts[worker]--;
         }
@@ -69,12 +72,10 @@ bool schedule(
     size_t num_workers = avail[0].size();
 
     sched.clear();
-    sched.resize(num_days);
-    for (size_t i = 0; i < num_days; ++i) {
-        sched[i].reserve(dailyNeed);
-    }
+    initSched(sched, 0, num_days, dailyNeed);
 
-    vector<size_t> shifts(num_workers, 0);
+    vector<size_t> shifts;
+    initShifts(shifts, 0, num_workers);
 
     return backtrack(avail, dailyNeed, maxShifts, sched, shifts, 0, 0);
 }
